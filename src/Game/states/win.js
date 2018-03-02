@@ -1,5 +1,9 @@
 export default function winState() {
+    var score =0;
     return {
+        init: function(data){
+            score = data.score;
+        },
         create: function () {
 
             this.game.world.bounds.x = 0;
@@ -18,9 +22,7 @@ export default function winState() {
 
             this.playbutton.anchor.setTo(0.5, 0.5);
 
-            this.tweenplay = this.game.add.tween(this.playbutton).to({ y: 550 }, 1000, Phaser.Easing.Sinusoidal.InOut, true, 0, 100, true);
-
-
+            this.tweenplay = this.game.add.tween(this.playbutton).to({ y: 550 }, 1000, window.Phaser.Easing.Sinusoidal.InOut, true, 0, 100, true);
 
         },
 

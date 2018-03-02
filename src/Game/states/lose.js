@@ -1,5 +1,9 @@
 export default function loseState(){
+    var score =0;
     return{
+        init: function(data){
+            score = data.score;
+        },
         create : function(){
 
             this.game.world.bounds.x = 0;
@@ -18,7 +22,7 @@ export default function loseState(){
     
             this.playbutton.anchor.setTo(0.5,0.5);
     
-            this.tweenplay = this.game.add.tween(this.playbutton).to({y:50},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
+            this.tweenplay = this.game.add.tween(this.playbutton).to({y:50},1000, window.Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
     
             this.scoretextmain = this.add.text(this.game.world.centerX,450,score,{ font: "40px Arial", fill: "#fff", align: "center" })
     

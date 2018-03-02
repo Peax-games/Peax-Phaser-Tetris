@@ -1,4 +1,4 @@
-export default function playState() {
+export default function playState(game) {
 
     var oldsquares = new Array();
 
@@ -11,6 +11,13 @@ export default function playState() {
     var slide_time = 0;
 
 
+    var len;
+    var w = 400;
+    var h = 600;
+    var score = 0;
+    var width = 30;
+    var height = 30;
+    var force_down_max_time = 500;
 
     var KEYLEFT;
 
@@ -19,42 +26,429 @@ export default function playState() {
     var KEYUP;
 
     var KEYDOWN;
+    var score = 0;
+    var row;
+
+    var md
+
+    var Block = function (game, x, y, type, color, scale) {
+
+        this.centerX = x;
+
+        this.centerY = y;
+
+        this.blocktype = type;
+
+        this.blockcolor = color;
+
+        this.game = game;
+
+        this.squares = new Array();
+
+        this.scale = scale;
+
+        this.setupsquares();
+
+    };
+
+
+
+    Block.prototype = {
+
+        setupsquares: function () {
+            md = (width * this.scale) / 2;
+            this.squares.length = 0;
+
+
+
+            switch (this.blocktype) {
+
+                case 'o': this.squares[0] = this.game.add.sprite(this.centerX - md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[1] = this.game.add.sprite(this.centerX - md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[2] = this.game.add.sprite(this.centerX + md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[3] = this.game.add.sprite(this.centerX + md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    break;
+
+                case 't': this.squares[0] = this.game.add.sprite(this.centerX + md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[1] = this.game.add.sprite(this.centerX + md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[2] = this.game.add.sprite(this.centerX - md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[3] = this.game.add.sprite(this.centerX + md * 3, this.centerY + md, 'blocks', this.blockcolor);
+
+                    break;
+
+                case 'l': this.squares[0] = this.game.add.sprite(this.centerX - md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[1] = this.game.add.sprite(this.centerX - md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[2] = this.game.add.sprite(this.centerX - md, this.centerY + md * 3, 'blocks', this.blockcolor);
+
+                    this.squares[3] = this.game.add.sprite(this.centerX + md, this.centerY + md * 3, 'blocks', this.blockcolor);
+
+                    break;
+
+                case 'j': this.squares[0] = this.game.add.sprite(this.centerX + md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[1] = this.game.add.sprite(this.centerX + md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[2] = this.game.add.sprite(this.centerX + md, this.centerY + md * 3, 'blocks', this.blockcolor);
+
+                    this.squares[3] = this.game.add.sprite(this.centerX - md, this.centerY + md * 3, 'blocks', this.blockcolor);
+
+                    break;
+
+                case 'i': this.squares[0] = this.game.add.sprite(this.centerX + md, this.centerY - md * 3, 'blocks', this.blockcolor);
+
+                    this.squares[1] = this.game.add.sprite(this.centerX + md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[2] = this.game.add.sprite(this.centerX + md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[3] = this.game.add.sprite(this.centerX + md, this.centerY + md * 3, 'blocks', this.blockcolor);
+
+                    break;
+
+                case 's': this.squares[0] = this.game.add.sprite(this.centerX + md * 3, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[1] = this.game.add.sprite(this.centerX + md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[2] = this.game.add.sprite(this.centerX + md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[3] = this.game.add.sprite(this.centerX - md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    break;
+
+                case 'z': this.squares[0] = this.game.add.sprite(this.centerX - md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[1] = this.game.add.sprite(this.centerX + md, this.centerY - md, 'blocks', this.blockcolor);
+
+                    this.squares[2] = this.game.add.sprite(this.centerX + md, this.centerY + md, 'blocks', this.blockcolor);
+
+                    this.squares[3] = this.game.add.sprite(this.centerX + md * 3, this.centerY + md, 'blocks', this.blockcolor);
+
+                    break;
+
+            }
+
+            for (let i = 0; i < this.squares.length; i++) {
+
+                this.squares[i].anchor.setTo(0.5, 0.5);
+
+                this.squares[i].scale.setTo(this.scale, this.scale)
+
+                this.squares[i].collideWorldBounds = true;
+
+            }
+
+        },
+
+
+
+        move: function (dir) {
+
+            switch (dir) {
+
+                case 'left': this.centerX -= width;
+
+                    for (var i = 0; i < this.squares.length; i++) {
+
+                        this.squares[i].x -= width;
+
+                    }
+
+                    break;
+
+                case 'right': this.centerX += width;
+
+                    for (var i = 0; i < this.squares.length; i++) {
+
+                        this.squares[i].x += width;
+
+                    }
+
+                    break;
+
+                case 'down': this.centerY += height;
+
+                    for (var i = 0; i < this.squares.length; i++) {
+
+                        this.squares[i].y += height;
+
+                    }
+
+                    break;
+
+            }
+
+
+
+        },
+
+
+
+        rotate: function () {
+
+            var x1, x2, y1, y2;
+
+            for (var i = 0; i < this.squares.length; i++) {
+
+
+
+                // Get the center of the current square
+
+                x1 = this.squares[i].x;
+
+                y1 = this.squares[i].y;
+
+
+
+                // Move the square so it's positioned at the origin 
+
+                x1 -= this.centerX;
+
+                y1 -= this.centerY;
+
+                // Do the actual rotation
+
+                x2 = - y1;
+
+                y2 = x1;
+
+
+
+                // Move the square back to its proper location 
+
+                x2 += this.centerX;
+
+                y2 += this.centerY;
+
+
+
+                // Set the square's location to our temporary variables 
+
+                this.squares[i].x = x2;
+
+                this.squares[i].y = y2;
+
+            }
+
+        },
+
+
+
+        getrotated: function () {
+
+            var temp_array = new Array();
+
+            var x1, y1, x2, y2;
+
+
+
+            for (var i = 0; i < this.squares.length; i++) {
+
+                x1 = this.squares[i].x;
+
+                y1 = this.squares[i].y;
+
+                x1 -= this.centerX;
+
+                y1 -= this.centerY;
+
+
+
+                x2 = - y1;
+
+                y2 = x1;
+
+
+
+                x2 += this.centerX;
+
+                y2 += this.centerY;
+
+
+
+                // Instead of setting the squares, we just store the values
+
+                temp_array[i * 2] = x2;
+
+                temp_array[i * 2 + 1] = y2;
+
+            }
+
+
+
+            return temp_array;
+
+        },
+
+
+
+        wallcollide: function (oldsquares, dir) {
+
+            len = oldsquares.length;
+
+            if (len == 0) {
+
+                switch (dir) {
+
+                    case 'left': for (var i = 0; i < 4; i++) {
+
+                        if (this.squares[i].x - 2 * md < this.game.world.bounds.x) return true;
+
+                    }
+
+                        break;
+
+
+
+                    case 'right': for (var i = 0; i < 4; i++) {
+
+                        if (this.squares[i].x + 2 * md > this.game.world.bounds.width) return true;
+
+                    }
+
+                        break;
+
+                    case 'down': for (var i = 0; i < 4; i++) {
+
+                        if (this.squares[i].y + 2 * md > this.game.world.height) return true;
+
+                    }
+
+                        break;
+
+                    default: return false;
+
+
+
+                }
+
+            } else {
+
+                switch (dir) {
+
+                    case 'left': for (var i = 0; i < 4; i++) {
+
+                        for (var j = 0; j < len; j++) {
+
+                            if (this.squares[i].x - md < this.game.world.bounds.x || (this.squares[i].x > oldsquares[j].x && this.squares[i].x - 3 * md < oldsquares[j].x && this.squares[i].y == oldsquares[j].y)) return true;
+
+                        }
+
+                    }
+
+                        break;
+
+
+
+                    case 'right': for (var i = 0; i < 4; i++) {
+
+                        for (var j = 0; j < len; j++) {
+
+                            if (this.squares[i].x + md > this.game.world.bounds.width || (this.squares[i].x < oldsquares[j].x && this.squares[i].x + 3 * md > oldsquares[j].x && this.squares[i].y == oldsquares[j].y)) return true;
+
+                        }
+
+                    }
+
+                        break;
+
+
+
+                    case 'down': for (var i = 0; i < 4; i++) {
+
+                        for (var j = 0; j < len; j++) {
+
+                            if (this.squares[i].y + 2 * md > this.game.world.bounds.height || (this.squares[i].y + 3 * md > oldsquares[j].y && this.squares[i].x == oldsquares[j].x)) return true;
+
+                        }
+
+                    }
+
+                        break;
+
+
+
+                    default: return false;
+
+                }
+
+            }
+
+        },
+
+
+
+        rotatecollide: function (oldsquares) {
+
+            var arr = this.getrotated();
+
+            var len = oldsquares.length;
+
+            for (var i = 0; i < 4; i++) {
+
+                if ((arr[i * 2] < this.game.world.bounds.x) || (arr[i * 2] > this.game.world.bounds.width)) return true;
+
+                if (arr[i * 2 + 1] > this.game.world.bounds.height) return true;
+
+                for (var j = 0; j < len; j++) {
+
+                    if ((Math.abs(arr[i * 2] - oldsquares[j].x) < width) && (Math.abs(arr[i * 2 + 1] - oldsquares[j].y) < height)) {
+
+                        return true;
+
+                    }
+
+                }
+
+            }
+
+            return false;
+
+        }
+
+    };
     return {
         create: function () {
 
             this.bck = this.game.add.sprite(0, 0, 'bck');
 
-            this.game.world.bounds.x = 21;
+            game.world.bounds.x = 28;
 
-            this.game.world.bounds.y = 0;
+            game.world.bounds.y = 0;
 
-            this.game.world.bounds.width = 280;
+            game.world.bounds.width = 280;
 
-            this.game.world.bounds.height = 590;
-
-
-
-            this.logo = this.game.add.sprite(295, 30, 'logo');
+            game.world.bounds.height = 592;
 
 
+            this.logo = game.add.sprite(295, 30, 'logo');
 
-            this.focusblock = new Block(this.game, this.game.world.centerX, -40, this.chooseblock(), this.choosecolor(), 1);
+
+
+            this.focusblock = new Block(game, game.world.centerX, -40, this.chooseblock(), this.choosecolor(), 1);
 
             this.nextblocktype = this.chooseblock();
 
             this.nextblockcolor = this.choosecolor();
 
-            this.nextblock = new Block(this.game, 330, 271, this.nextblocktype, this.nextblockcolor, 0.7);
+            this.nextblock = new Block(game, 330, 271, this.nextblocktype, this.nextblockcolor, 0.7);
 
 
 
-            KEYRIGHT = this.game.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+            KEYRIGHT = this.game.input.keyboard.addKey(window.Phaser.Keyboard.RIGHT);
 
-            KEYLEFT = this.game.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+            KEYLEFT = this.game.input.keyboard.addKey(window.Phaser.Keyboard.LEFT);
 
-            KEYUP = this.game.input.keyboard.addKey(Phaser.Keyboard.UP);
+            KEYUP = this.game.input.keyboard.addKey(window.Phaser.Keyboard.UP);
 
-            KEYDOWN = this.game.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+            KEYDOWN = this.game.input.keyboard.addKey(window.Phaser.Keyboard.DOWN);
 
 
 
@@ -109,7 +503,7 @@ export default function playState() {
 
         resetbuttondown: function () {
 
-            this.game.state.start('MainMenu');
+            this.game.state.start('menu');
 
         },
 

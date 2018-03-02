@@ -1,9 +1,7 @@
 export default function menuState(){
+    var score =0;
     return{
         create : function(){
-
-		
-
             this.game.world.bounds.x = 0;
     
             this.game.world.bounds.y = 0;
@@ -16,8 +14,7 @@ export default function menuState(){
     
             this.playbutton.anchor.setTo(0.5,0.5);
     
-            this.tweenplay = this.game.add.tween(this.playbutton).to({y:300},1000,Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
-    
+            this.tweenplay = this.game.add.tween(this.playbutton).to({y:300},1000, window.Phaser.Easing.Sinusoidal.InOut,true,0,100,true);
     
     
             this.arrows = this.game.add.sprite(this.game.world.centerX,this.game.world.centerY+180,'arrow');
@@ -40,7 +37,7 @@ export default function menuState(){
     
             score = 0;
     
-            this.game.state.start('Game');
+            this.game.state.start('play');
     
         },
     }
